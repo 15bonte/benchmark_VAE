@@ -107,6 +107,7 @@ VAE with Inverse Autoregressive Flows (VAE_IAF) |  [![Open In Colab](https://col
 | Regularized AE with L2 decoder param (RAE_L2) | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/clementchadebec/benchmark_VAE/blob/main/examples/notebooks/models_training/rae_l2_training.ipynb) | [link](https://arxiv.org/abs/1903.12436) | [link](https://github.com/ParthaEth/Regularized_autoencoders-RAE-/tree/master/) |
 | Regularized AE with gradient penalty (RAE_GP) | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/clementchadebec/benchmark_VAE/blob/main/examples/notebooks/models_training/rae_gp_training.ipynb) | [link](https://arxiv.org/abs/1903.12436) | [link](https://github.com/ParthaEth/Regularized_autoencoders-RAE-/tree/master/) |
 | Riemannian Hamiltonian VAE (RHVAE) | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/clementchadebec/benchmark_VAE/blob/main/examples/notebooks/models_training/rhvae_training.ipynb) | [link](https://arxiv.org/abs/2105.00026) | [link](https://github.com/clementchadebec/pyraug)|
+| Hierarchical Residual Quantization (HRQVAE) | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/clementchadebec/benchmark_VAE/blob/main/examples/notebooks/models_training/hrqvae_training.ipynb) | [link](https://aclanthology.org/2022.acl-long.178/) | [link](https://github.com/tomhosking/hrq-vae)|
 
 **See [reconstruction](#Reconstruction) and [generation](#Generation) results for all aforementionned models**
 
@@ -360,8 +361,8 @@ To do so, you can build a python script that will then be launched by a launcher
 ...     eval_dataloader_num_workers=8,
 ...     dist_backend="nccl", # distributed backend
 ...     world_size=8 # number of gpus to use (n_nodes x n_gpus_per_node),
-...     rank=5 # process/gpu id,
-...     local_rank=1 # node id,
+...     rank=5 # global gpu id,
+...     local_rank=1 # gpu id within a node,
 ...     master_addr="localhost" # master address,
 ...     master_port="12345" # master port,
 ... )

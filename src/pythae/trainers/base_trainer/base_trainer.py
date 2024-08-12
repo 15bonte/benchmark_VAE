@@ -3,14 +3,14 @@ import datetime
 import logging
 import os
 from copy import deepcopy
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List, Optional, Union
 
 import torch
 import torch.distributed as dist
 import torch.optim as optim
 import torch.optim.lr_scheduler as lr_scheduler
 from torch.nn.parallel import DistributedDataParallel as DDP
-from torch.utils.data import DataLoader
+from torch.utils.data import DataLoader, Dataset
 from torch.utils.data.distributed import DistributedSampler
 
 from ...customexception import ModelError
@@ -56,12 +56,11 @@ class BaseTrainer:
     def __init__(
         self,
         model: BaseAE,
-        train_dataset: BaseDataset,
-        eval_dataset: Optional[BaseDataset] = None,
+        train_dataset: Union[BaseDataset, DataLoader],
+        eval_dataset: Optional[Union[BaseDataset, DataLoader]] = None,
         training_config: Optional[BaseTrainerConfig] = None,
         callbacks: List[TrainingCallback] = None,
     ):
-
         if training_config is None:
             training_config = BaseTrainerConfig()
 
@@ -119,11 +118,24 @@ class BaseTrainer:
         self.eval_dataset = eval_dataset
 
         # Define the loaders
-        train_loader = self.get_train_dataloader(train_dataset)
+        if isinstance(train_dataset, DataLoader):
+            train_loader = train_dataset
+            logger.warn(
+                "Using the provided train dataloader! Carefull this may overwrite some "
+                "parameters provided in your training config."
+            )
+        else:
+            train_loader = self.get_train_dataloader(train_dataset)
 
         if eval_dataset is not None:
-            eval_loader = self.get_eval_dataloader(eval_dataset)
-
+            if isinstance(eval_dataset, DataLoader):
+                eval_loader = eval_dataset
+                logger.warn(
+                    "Using the provided eval dataloader! Carefull this may overwrite some "
+                    "parameters provided in your training config."
+                )
+            else:
+                eval_loader = self.get_eval_dataloader(eval_dataset)
         else:
             logger.info(
                 "! No eval dataset provided ! -> keeping best model on train.\n"
@@ -340,7 +352,6 @@ class BaseTrainer:
         return optim
 
     def _set_inputs_to_device(self, inputs: Dict[str, Any]):
-
         inputs_on_device = inputs
 
         if self.device == "cuda":
@@ -357,7 +368,6 @@ class BaseTrainer:
         return inputs_on_device
 
     def _optimizers_step(self, model_output=None):
-
         loss = model_output.loss
 
         self.optimizer.zero_grad()
@@ -435,7 +445,6 @@ class BaseTrainer:
         best_eval_loss = 1e10
 
         for epoch in range(1, self.training_config.num_epochs + 1):
-
             self.callback_handler.on_epoch_begin(
                 training_config=self.training_config,
                 epoch=epoch,
@@ -548,12 +557,10 @@ class BaseTrainer:
 
         with self.amp_context:
             for inputs in self.eval_loader:
-
                 inputs = self._set_inputs_to_device(inputs)
 
                 try:
                     with torch.no_grad():
-
                         model_output = self.model(
                             inputs,
                             epoch=epoch,
@@ -606,7 +613,6 @@ class BaseTrainer:
         epoch_loss = 0
 
         for inputs in self.train_loader:
-
             inputs = self._set_inputs_to_device(inputs)
 
             with self.amp_context:
@@ -699,7 +705,6 @@ class BaseTrainer:
         self.training_config.save_json(checkpoint_dir, "training_config")
 
     def predict(self, model: BaseAE):
-
         model.eval()
 
         with self.amp_context:

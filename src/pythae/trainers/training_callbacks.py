@@ -202,7 +202,6 @@ class MetricConsolePrinterCallback(TrainingCallback):
         self.logger.setLevel(logging.INFO)
 
     def on_log(self, training_config: BaseTrainerConfig, logs, **kwargs):
-
         logger = kwargs.pop("logger", self.logger)
         rank = kwargs.pop("rank", -1)
 
@@ -394,7 +393,6 @@ class WandbCallback(TrainingCallback):  # pragma: no cover
             and generations is not None
         ):
             for i in range(len(true_data)):
-
                 data_to_log.append(
                     [
                         f"img_{i}",
@@ -562,7 +560,6 @@ class CometCallback(TrainingCallback):  # pragma: no cover
         offline_directory: str = "./",
         **kwargs,
     ):
-
         """
         Setup the CometCallback.
 
@@ -632,7 +629,6 @@ class CometCallback(TrainingCallback):  # pragma: no cover
             and generations is not None
         ):
             for i in range(len(true_data)):
-
                 experiment.log_image(
                     np.moveaxis(true_data[i].cpu().detach().numpy(), 0, -1),
                     name=f"{i}_truth",
