@@ -112,16 +112,7 @@ class TrainingPipeline(Pipeline):
 
     def _check_dataset(self, dataset: BaseDataset):
 
-        try:
-            dataset_output = dataset[0]
-
-        except Exception as e:
-            raise DatasetError(
-                "Error when trying to collect data from the dataset. Check `__getitem__` method. "
-                "The Dataset should output a dictionnary with keys at least ['data']. "
-                "Please check documentation.\n"
-                f"Exception raised: {type(e)} with message: " + str(e)
-            ) from e
+        dataset_output = dataset[0]
 
         if "data" not in dataset_output.keys():
             raise DatasetError(

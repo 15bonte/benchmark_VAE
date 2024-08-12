@@ -184,11 +184,7 @@ class BaseAE(nn.Module):
         ).reshape((starting_z.shape[0] * t.shape[0],) + (starting_z.shape[1:]))
 
         decoded_line = self.decoder(intep_line).reconstruction.reshape(
-            (
-                starting_inputs.shape[0],
-                t.shape[0],
-            )
-            + (starting_inputs.shape[1:])
+            (starting_inputs.shape[0], t.shape[0], -1) + (starting_inputs.shape[2:])
         )
 
         return decoded_line

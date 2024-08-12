@@ -328,6 +328,7 @@ class WandbCallback(TrainingCallback):  # pragma: no cover
         model_config: BaseAEConfig = None,
         project_name: str = "pythae_experiment",
         entity_name: str = None,
+        run_name: str = None,
         **kwargs,
     ):
         """
@@ -347,7 +348,7 @@ class WandbCallback(TrainingCallback):  # pragma: no cover
 
         training_config_dict = training_config.to_dict()
 
-        self.run = self._wandb.init(project=project_name, entity=entity_name)
+        self.run = self._wandb.init(project=project_name, entity=entity_name, name=run_name)
 
         if model_config is not None:
             model_config_dict = model_config.to_dict()
