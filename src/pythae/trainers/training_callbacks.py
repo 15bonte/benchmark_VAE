@@ -35,8 +35,11 @@ def rename_logs(logs):
         if metric_name.startswith(train_prefix):
             clean_logs[metric_name.replace(train_prefix, "train/")] = logs[metric_name]
 
-        if metric_name.startswith(eval_prefix):
+        elif metric_name.startswith(eval_prefix):
             clean_logs[metric_name.replace(eval_prefix, "eval/")] = logs[metric_name]
+
+        else:
+            clean_logs[metric_name] = logs[metric_name]
 
     return clean_logs
 
